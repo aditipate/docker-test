@@ -1,21 +1,22 @@
-# A streamlit example for JupyterHub
-FROM python:3.7
+FROM python:3.9-slim
 
-# Install Requirements
-COPY requirements.txt ./requirements.txt
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    software-properties-common \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+#RUN git clone https://github.com/streamlit/streamlit-example.git .
+
+COPY . . 
+
 RUN pip3 install -r requirements.txt
 
-# create a user, since we don't want to run as root
-# RUN useradd -m jovyan
-# ENV HOME=/home/jovyan
-# WORKDIR $HOME
-# USER jovyan
+EXPOSE 8501
 
-# Set app directory
-WORKDIR /app
-COPY . .
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
-EXPOSE 8888
-
-# CMD ["jhsingle-native-proxy", "--port", "8501", "--destport", "8505", "streamlit", "run", "./app.py", "{--}server.port", "{port}", "{--}server.headless", "True", "{--}server.enableCORS", "False"]
-CMD ["streamlit", "run", "/app/app.py"]
+ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
