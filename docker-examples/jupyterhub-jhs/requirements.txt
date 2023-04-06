@@ -1,0 +1,5 @@
+streamlit
+jhsingle-native-proxy
+jupyterhub>=1.0.0
+dockerspawner
+oauthenticator
